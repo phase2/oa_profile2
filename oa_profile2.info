@@ -1,0 +1,7 @@
+name = Open Atrium Profile2
+description = Integrates Profile2 with Open Atrium
+package = Open Atrium
+core = 7.x
+
+dependencies[] = profile2
+dependencies[] = oa_access

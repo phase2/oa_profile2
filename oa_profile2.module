@@ -1,0 +1,59 @@
+<?php
+/**
+ * @file
+ * Code for the Open Atrium Profile2 module.
+ */
+
+/**
+ * Implements hook_oa_access_permission().
+ */
+function oa_profile2_oa_access_permission() {
+  $permissions = array();
+  // Generate per profile type permissions.
+  foreach (profile2_get_types() as $type) {
+    $type_name = check_plain($type->type);
+    $permissions += array(
+      "edit own $type_name profile" => array(
+        'title' => t('%type_name: Edit own profile', array('%type_name' => $type->label)),
+        'type' => OA_ACCESS_GROUP_PERMISSION,
+      ),
+      "edit any $type_name profile" => array(
+        'title' => t('%type_name: Edit any profile', array('%type_name' => $type->label)),
+        'type' => OA_ACCESS_GROUP_PERMISSION,
+      ),
+      "view own $type_name profile" => array(
+        'title' => t('%type_name: View own profile', array('%type_name' => $type->label)),
+        'type' => OA_ACCESS_GROUP_PERMISSION,
+      ),
+      "view any $type_name profile" => array(
+        'title' => t('%type_name: View any profile', array('%type_name' => $type->label)),
+        'type' => OA_ACCESS_GROUP_PERMISSION,
+      ),
+    );
+  }
+  return $permissions;
+}
+
+/**
+ * Implements hook_profile2_access().
+ *
+ * @see profile2_profile2_access()
+ */
+function oa_profile2_profile2_access($op, $profile = NULL, $account = NULL) {
+  global $user;
+
+  if (is_null($account)) {
+    $account = $user;
+  }
+
+  if (isset($profile) && ($type_name = $profile->type) && $op != 'delete') {
+    $any = "$op any $type_name profile";
+    $own = "$op own $type_name profile";
+
+    // Only return TRUE if oa_acces grants access. So other modules may still
+    // grant access in case it does not.
+    if (oa_access(NULL, $any, $account) || ($profile->uid == $account->uid && oa_access(NULL, $own, $account))) {
+      return TRUE;
+    }
+  }
+}
