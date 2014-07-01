@@ -57,3 +57,29 @@ function oa_profile2_profile2_access($op, $profile = NULL, $account = NULL) {
     }
   }
 }
+
+/**
+ * Implements hook_theme().
+ */
+function oa_profile2_theme() {
+  return array(
+    'oa_profile2' => array(
+      'render element' => 'elements',
+      'template' => 'oa_profile2',
+      'path' => drupal_get_path('module', 'oa_profile2'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_preprocess_entity().
+ * Adds a view-mode-specific tpl template
+ */
+function oa_profile2_preprocess_entity(&$variables) {
+  $entity_type = $variables['elements']['#entity_type'];
+  if ($entity_type == 'profile2') {
+    $variables['view_mode'] = $variables['elements']['#view_mode'];
+    $variables['theme_hook_suggestions'][] = 'oa_profile2';
+    $variables['theme_hook_suggestions'][] = 'oa_profile2__' . $variables['view_mode'];
+  }
+}
